@@ -1,6 +1,5 @@
 # Copyright (c) 2015, Frappe Technologies Pvt. Ltd. and Contributors
 # See license.txt
-
 import unittest
 
 import frappe
@@ -10,11 +9,16 @@ from erpnext.accounts.doctype.budget.budget import BudgetError, get_actual_expen
 from erpnext.accounts.doctype.journal_entry.test_journal_entry import make_journal_entry
 from erpnext.accounts.utils import get_fiscal_year
 from erpnext.buying.doctype.purchase_order.test_purchase_order import create_purchase_order
+from erpnext.tests.utils import ERPNextTestSuite
 
-test_dependencies = ["Monthly Distribution"]
 
+class TestBudget(ERPNextTestSuite):
+	@classmethod
+	def setUpClass(cls):
+		super().setUpClass()
+		cls.make_monthly_distribution()
+		cls.make_projects()
 
-class TestBudget(unittest.TestCase):
 	def test_monthly_budget_crossed_ignore(self):
 		set_total_expense_zero(nowdate(), "cost_center")
 
@@ -41,9 +45,7 @@ class TestBudget(unittest.TestCase):
 
 		budget = make_budget(budget_against="Cost Center")
 
-		frappe.db.set_value(
-			"Budget", budget.name, "action_if_accumulated_monthly_budget_exceeded", "Stop"
-		)
+		frappe.db.set_value("Budget", budget.name, "action_if_accumulated_monthly_budget_exceeded", "Stop")
 
 		jv = make_journal_entry(
 			"_Test Account Cost for Goods Sold - _TC",
@@ -63,9 +65,7 @@ class TestBudget(unittest.TestCase):
 
 		budget = make_budget(budget_against="Cost Center")
 
-		frappe.db.set_value(
-			"Budget", budget.name, "action_if_accumulated_monthly_budget_exceeded", "Stop"
-		)
+		frappe.db.set_value("Budget", budget.name, "action_if_accumulated_monthly_budget_exceeded", "Stop")
 
 		jv = make_journal_entry(
 			"_Test Account Cost for Goods Sold - _TC",
@@ -97,9 +97,7 @@ class TestBudget(unittest.TestCase):
 		)
 
 		fiscal_year = get_fiscal_year(nowdate())[0]
-		frappe.db.set_value(
-			"Budget", budget.name, "action_if_accumulated_monthly_budget_exceeded", "Stop"
-		)
+		frappe.db.set_value("Budget", budget.name, "action_if_accumulated_monthly_budget_exceeded", "Stop")
 		frappe.db.set_value("Budget", budget.name, "fiscal_year", fiscal_year)
 
 		mr = frappe.get_doc(
@@ -138,9 +136,7 @@ class TestBudget(unittest.TestCase):
 		)
 
 		fiscal_year = get_fiscal_year(nowdate())[0]
-		frappe.db.set_value(
-			"Budget", budget.name, "action_if_accumulated_monthly_budget_exceeded", "Stop"
-		)
+		frappe.db.set_value("Budget", budget.name, "action_if_accumulated_monthly_budget_exceeded", "Stop")
 		frappe.db.set_value("Budget", budget.name, "fiscal_year", fiscal_year)
 
 		po = create_purchase_order(transaction_date=nowdate(), do_not_submit=True)
@@ -158,9 +154,7 @@ class TestBudget(unittest.TestCase):
 
 		budget = make_budget(budget_against="Project")
 
-		frappe.db.set_value(
-			"Budget", budget.name, "action_if_accumulated_monthly_budget_exceeded", "Stop"
-		)
+		frappe.db.set_value("Budget", budget.name, "action_if_accumulated_monthly_budget_exceeded", "Stop")
 
 		project = frappe.get_value("Project", {"project_name": "_Test Project"})
 
@@ -223,7 +217,7 @@ class TestBudget(unittest.TestCase):
 		if month > 9:
 			month = 9
 
-		for i in range(month + 1):
+		for _i in range(month + 1):
 			jv = make_journal_entry(
 				"_Test Account Cost for Goods Sold - _TC",
 				"_Test Bank - _TC",
@@ -237,9 +231,7 @@ class TestBudget(unittest.TestCase):
 				frappe.db.get_value("GL Entry", {"voucher_type": "Journal Entry", "voucher_no": jv.name})
 			)
 
-		frappe.db.set_value(
-			"Budget", budget.name, "action_if_accumulated_monthly_budget_exceeded", "Stop"
-		)
+		frappe.db.set_value("Budget", budget.name, "action_if_accumulated_monthly_budget_exceeded", "Stop")
 
 		self.assertRaises(BudgetError, jv.cancel)
 
@@ -255,7 +247,7 @@ class TestBudget(unittest.TestCase):
 			month = 9
 
 		project = frappe.get_value("Project", {"project_name": "_Test Project"})
-		for i in range(month + 1):
+		for _i in range(month + 1):
 			jv = make_journal_entry(
 				"_Test Account Cost for Goods Sold - _TC",
 				"_Test Bank - _TC",
@@ -270,9 +262,7 @@ class TestBudget(unittest.TestCase):
 				frappe.db.get_value("GL Entry", {"voucher_type": "Journal Entry", "voucher_no": jv.name})
 			)
 
-		frappe.db.set_value(
-			"Budget", budget.name, "action_if_accumulated_monthly_budget_exceeded", "Stop"
-		)
+		frappe.db.set_value("Budget", budget.name, "action_if_accumulated_monthly_budget_exceeded", "Stop")
 
 		self.assertRaises(BudgetError, jv.cancel)
 
@@ -284,9 +274,7 @@ class TestBudget(unittest.TestCase):
 		set_total_expense_zero(nowdate(), "cost_center", "_Test Cost Center 2 - _TC")
 
 		budget = make_budget(budget_against="Cost Center", cost_center="_Test Company - _TC")
-		frappe.db.set_value(
-			"Budget", budget.name, "action_if_accumulated_monthly_budget_exceeded", "Stop"
-		)
+		frappe.db.set_value("Budget", budget.name, "action_if_accumulated_monthly_budget_exceeded", "Stop")
 
 		jv = make_journal_entry(
 			"_Test Account Cost for Goods Sold - _TC",
@@ -316,9 +304,7 @@ class TestBudget(unittest.TestCase):
 			).insert(ignore_permissions=True)
 
 		budget = make_budget(budget_against="Cost Center", cost_center=cost_center)
-		frappe.db.set_value(
-			"Budget", budget.name, "action_if_accumulated_monthly_budget_exceeded", "Stop"
-		)
+		frappe.db.set_value("Budget", budget.name, "action_if_accumulated_monthly_budget_exceeded", "Stop")
 
 		jv = make_journal_entry(
 			"_Test Account Cost for Goods Sold - _TC",
@@ -423,13 +409,11 @@ def make_budget(**args):
 	fiscal_year = get_fiscal_year(nowdate())[0]
 
 	if budget_against == "Project":
-		project_name = "{0}%".format("_Test Project/" + fiscal_year)
+		project_name = "{}%".format("_Test Project/" + fiscal_year)
 		budget_list = frappe.get_all("Budget", fields=["name"], filters={"name": ("like", project_name)})
 	else:
-		cost_center_name = "{0}%".format(cost_center or "_Test Cost Center - _TC/" + fiscal_year)
-		budget_list = frappe.get_all(
-			"Budget", fields=["name"], filters={"name": ("like", cost_center_name)}
-		)
+		cost_center_name = "{}%".format(cost_center or "_Test Cost Center - _TC/" + fiscal_year)
+		budget_list = frappe.get_all("Budget", fields=["name"], filters={"name": ("like", cost_center_name)})
 	for d in budget_list:
 		frappe.db.sql("delete from `tabBudget` where name = %(name)s", d)
 		frappe.db.sql("delete from `tabBudget Account` where parent = %(name)s", d)
@@ -451,24 +435,18 @@ def make_budget(**args):
 	budget.action_if_annual_budget_exceeded = "Stop"
 	budget.action_if_accumulated_monthly_budget_exceeded = "Ignore"
 	budget.budget_against = budget_against
-	budget.append(
-		"accounts", {"account": "_Test Account Cost for Goods Sold - _TC", "budget_amount": 200000}
-	)
+	budget.append("accounts", {"account": "_Test Account Cost for Goods Sold - _TC", "budget_amount": 200000})
 
 	if args.applicable_on_material_request:
 		budget.applicable_on_material_request = 1
-		budget.action_if_annual_budget_exceeded_on_mr = (
-			args.action_if_annual_budget_exceeded_on_mr or "Warn"
-		)
+		budget.action_if_annual_budget_exceeded_on_mr = args.action_if_annual_budget_exceeded_on_mr or "Warn"
 		budget.action_if_accumulated_monthly_budget_exceeded_on_mr = (
 			args.action_if_accumulated_monthly_budget_exceeded_on_mr or "Warn"
 		)
 
 	if args.applicable_on_purchase_order:
 		budget.applicable_on_purchase_order = 1
-		budget.action_if_annual_budget_exceeded_on_po = (
-			args.action_if_annual_budget_exceeded_on_po or "Warn"
-		)
+		budget.action_if_annual_budget_exceeded_on_po = args.action_if_annual_budget_exceeded_on_po or "Warn"
 		budget.action_if_accumulated_monthly_budget_exceeded_on_po = (
 			args.action_if_accumulated_monthly_budget_exceeded_on_po or "Warn"
 		)
