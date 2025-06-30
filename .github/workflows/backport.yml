@@ -5,6 +5,9 @@ on:
       - closed
       - labeled
 
+permissions:
+  contents: read
+
 jobs:
   main:
     runs-on: ubuntu-latest
@@ -21,6 +24,6 @@ jobs:
       - name: Run backport
         uses: ./actions/backport
         with:
-          token: ${{secrets.BACKPORT_BOT_TOKEN}}
+          token: ${{secrets.RELEASE_TOKEN}}
           labelsToAdd: "backport"
           title: "{{originalTitle}}"
